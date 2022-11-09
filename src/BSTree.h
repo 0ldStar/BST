@@ -7,15 +7,18 @@
 
 #include <iostream>
 #include <string>
-#include <stack>
+#include <list>
+#include <iomanip>
 #include "Node.h"
+#include "BSTreeStraightIterator.h"
+#include "BSTreeBackIterator.h"
 
 template<typename T>
 class BSTree {
 public:
     BSTree();
 
-    BSTree(BSTree &other);
+    BSTree(BSTree<T> &other);
 
     ~BSTree();
 
@@ -25,36 +28,38 @@ public:
 
     bool isEmpty();
 
-    T &operator[](unsigned ind);
+    T &operator[](unsigned key);
 
     bool push(int key, T data);
 
     bool pop(int key);
 
-    std::string getElementList();
+    std::string getKeysList();
 
     bool merge(BSTree<T> &other);
 
-    void begin();
+    BSTreeStraightIterator<T> begin();
 
-    void end();
+    BSTreeStraightIterator<T> end();
 
-    void rbegin();
+    BSTreeBackIterator<T> rbegin();
 
-    void rend();
+    BSTreeBackIterator<T> rend();
 
     void printStructure();
 
-    unsigned getLaboriousness;
 private:
-    void moveOnTree(void (BSTree<T>::*func)(Node<T> *));
-
     void putElementInStr(T data);
 
+    void popSwapNodes(Node<T> *target);
+
+    T getDefaultValue();
+
+    unsigned laboriousness;
     std::string elementList;
     Node<T> *root;
     unsigned elementCount;
-
+    unsigned maxLayer;
 };
 
 #endif //ASD_2_BSTREE_H

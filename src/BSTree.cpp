@@ -10,79 +10,181 @@ template<typename T>
 BSTree<T>::BSTree() {
     root = nullptr;
     elementCount = 0;
+    laboriousness = 0;
+    maxLayer = 0;
+}
+
+template<typename T>
+BSTree<T>::BSTree(BSTree<T> &other) {
+    root = nullptr;
+    elementCount = 0;
+    laboriousness = 0;
+    maxLayer = 0;
+    auto nodeList = new list<Node<T> *>();
+    auto top = other.root;
+    while (top != nullptr || !nodeList->empty()) {
+        if (!nodeList->empty()) {
+            top = nodeList->front();
+            nodeList->pop_front();
+        }
+        while (top != nullptr) {
+            push(top->key, top->data);
+            if (top->right != nullptr) nodeList->push_front(top->right);
+            top = top->left;
+        }
+    }
 }
 
 template<typename T>
 BSTree<T>::~BSTree() {
-
+    clear();
 }
 
-#include <list>
 
 template<typename T>
 bool BSTree<T>::push(int key, T data) {
     auto nodeList = new list<Node<T> *>();
     Node<T> *top = root;
+    unsigned layer = 0;
     if (!top) {
-        root = new Node<T>(data, key, nullptr);
+        root = new Node<T>(data, key, nullptr, layer);
+        elementCount++;
         return true;
     }
     while (top != nullptr || !nodeList->empty()) {
+        if (top) {
+            if (key < top->key) {
+                if (!top->left) {
+                    top->left = new Node<T>(data, key, top, layer + 1);
+                    if (layer + 1 > maxLayer) maxLayer = layer + 1;
+                    elementCount++;
+                    return true;
+                } else {
+                    nodeList->push_front(top->left);
+                }
+            } else if (key > top->key) {
+                if (!top->right) {
+                    top->right = new Node<T>(data, key, top, layer + 1);
+                    if (layer + 1 > maxLayer) maxLayer = layer + 1;
+                    elementCount++;
+                    return true;
+                } else {
+                    nodeList->push_front(top->right);
+                }
+            } else {
+                top->data = data;
+                return true;
+            }
+        }
+        top = nodeList->back();
+        nodeList->pop_back();
+        layer++;
+    }
+    return false;
+}
+
+template<typename T>
+bool BSTree<T>::pop(int key) {
+    if (!root)
+        return false;
+
+    auto nodeList = new list<Node<T> *>();
+    Node<T> *top = root;
+    while (top != nullptr || !nodeList->empty()) {
         if (key < top->key) {
             if (!top->left) {
-                top->left = new Node<T>(data, key, top);
-                return true;
+                return false;
             } else {
                 nodeList->push_front(top->left);
             }
         } else if (key > top->key) {
             if (!top->right) {
-                top->right = new Node<T>(data, key, top);
-                return true;
+                return false;
             } else {
                 nodeList->push_front(top->right);
             }
         } else {
-            auto *tmp = new Node<T>(data, top->key, top->parent, top->left, top->right);
-            if (top->left) {
-                top->left->parent = tmp;
-            }
-            if (top->right) {
-                top->right->parent = tmp;
-            }
-            if (top->parent) {
-                if (top == top->parent->left) {
-                    top->parent->left = tmp;
-                } else {
-                    top->parent->right = tmp;
-                }
-            }
-            delete top;
-            top = tmp; // todo need to check
+            popSwapNodes(top);
             return true;
         }
         top = nodeList->back();
         nodeList->pop_back();
     }
+    return false;
 }
 
 template<typename T>
-std::string BSTree<T>::getElementList() {
+void BSTree<T>::popSwapNodes(Node<T> *target) {
+    Node<T> *parent = target->parent;
+
+    if (target->right && target->left) {
+        if (parent) {
+            if (parent->right == target) parent->right = target->right;
+            else parent->left = target->right;
+        }
+        Node<T> *tmp = target->right;
+        while (tmp->left != nullptr) {
+            tmp = tmp->left;
+        }
+        tmp->left = target->left;
+        target->left->parent = tmp;
+        target->right->parent = parent;
+        if (root == target) root = target->right;
+    } else if (target->right) {
+        target->right->parent = parent;
+        if (parent) {
+            if (parent->left == target) parent->left = target->right;
+            else parent->right = target->right;
+        }
+        if (root == target) root = target->right;
+    } else if (target->left) {
+        target->left->parent = parent;
+        if (parent) {
+            if (parent->left == target) parent->left = target->left;
+            else parent->right = target->left;
+        }
+        if (root == target) root = target->left;
+    } else {
+        if (parent) {
+            if (parent->left == target) parent->left = nullptr;
+            else parent->right = nullptr;
+        }
+        if (root == target) root = nullptr;
+    }
+
+    delete target;
+    elementCount--;
+}
+
+template<typename T>
+std::string BSTree<T>::getKeysList() {
     elementList.clear();
-    auto nodeList = new list<Node<T> *>();
-    Node<T> *top = root;
-    while (top != nullptr || !nodeList->empty()) {
-        if (!nodeList->empty()) {
-            top = nodeList->front();
-            nodeList->pop_front();
-            putElementInStr(top->key);
-            if (top->right != nullptr) top = top->right;
-            else top = nullptr;
+    if (root) {
+        auto nodeList = new list<Node<T> *>();
+        Node<T> *top = root;
+        while (top != nullptr || !nodeList->empty()) {
+            if (!nodeList->empty()) {
+                top = nodeList->front();
+                nodeList->pop_front();
+                if (!nodeList->empty() && top->right == nodeList->front()) {
+                    top = nodeList->front();
+                    nodeList->pop_front();
+                } else {
+                    putElementInStr(top->key);
+                    top = nullptr;
+                }
+            }
+            while (top != nullptr) {
+                nodeList->push_front(top);
+                if (top->right != nullptr) {
+                    nodeList->push_front(top->right);
+                    nodeList->push_front(top);
+                }
+                top = top->left;
+            }
         }
-        while (top != nullptr) {
-            nodeList->push_front(top);
-            top = top->left;
-        }
+    } else {
+        elementList = "BSTree is empty!";
     }
     return elementList;
 }
@@ -93,6 +195,179 @@ void BSTree<T>::putElementInStr(T data) {
     elementList.append(to_string(data));
     elementList.append(" ");
 }
+
+template<typename T>
+unsigned BSTree<T>::getLength() { return elementCount; }
+
+template<typename T>
+bool BSTree<T>::isEmpty() { return elementCount == 0; }
+
+
+template<typename T>
+void BSTree<T>::clear() {
+    if (root) {
+        auto nodeList = new list<Node<T> *>();
+        Node<T> *top = root;
+        while (top != nullptr || !nodeList->empty()) {
+            if (!nodeList->empty()) {
+                top = nodeList->front();
+                nodeList->pop_front();
+                if (!nodeList->empty() && top->right == nodeList->front()) {
+                    top = nodeList->front();
+                    nodeList->pop_front();
+                } else {
+                    if (top->parent && top->parent->left == top) {
+                        top->parent->left = nullptr;
+                    } else if (top->parent) {
+                        top->parent->right = nullptr;
+                    }
+                    delete top;
+                    top = nullptr;
+                }
+            }
+            while (top != nullptr) {
+                nodeList->push_front(top);
+                if (top->right != nullptr) {
+                    nodeList->push_front(top->right);
+                    nodeList->push_front(top);
+                }
+                top = top->left;
+            }
+        }
+        root = nullptr;
+    }
+}
+
+template<typename T>
+T &BSTree<T>::operator[](unsigned int key) {
+    if (root) {
+        auto nodeList = new list<Node<T> *>();
+        Node<T> *top = root;
+        while (top != nullptr || !nodeList->empty()) {
+            if (top) {
+                if (key < top->key && top->left) {
+                    nodeList->push_front(top->left);
+                } else if (key > top->key && top->right) {
+                    nodeList->push_front(top->right);
+                } else {
+                    return top->data;
+                }
+            }
+            top = nodeList->back();
+            nodeList->pop_back();
+        }
+    }
+    T tmp = getDefaultValue();
+    return tmp;
+
+}
+
+template<typename T>
+bool BSTree<T>::merge(BSTree<T> &other) {
+    if (!root) {
+        root = nullptr;
+        elementCount = 0;
+        laboriousness = 0;
+    }
+    auto nodeList = new list<Node<T> *>();
+    auto top = other.root;
+    while (top != nullptr || !nodeList->empty()) {
+        if (!nodeList->empty()) {
+            top = nodeList->front();
+            nodeList->pop_front();
+        }
+        while (top != nullptr) {
+            push(top->key, top->data);
+            if (top->right != nullptr) nodeList->push_front(top->right);
+            top = top->left;
+        }
+    }
+    return true;
+}
+
+template<typename T>
+void BSTree<T>::printStructure() {
+    auto nodeList = new list<Node<T> *>();
+    Node<T> *top = root;
+    bool flag;
+    unsigned layer = -1;
+    bool firstElFlag = false;
+    cout << "Max layer: " << maxLayer << endl;
+    string buf;
+    char tmp[4];
+
+    do {
+        flag = false;
+        if (layer != top->layer) {
+            layer = top->layer;
+            buf.append("\n");
+            firstElFlag = true;
+        }
+        if (top->key != -1000 && firstElFlag) {
+            firstElFlag = false;
+            for (int i = 0; i < (1 << (maxLayer - layer)) - 1; ++i) {
+                buf.append("   ");
+            }
+        }
+        if (top->key == -1000) {
+            if (top->layer <= maxLayer)
+                buf.append("*  ");
+        } else {
+            sprintf(tmp, "%-3d", top->key);
+            buf.append(tmp);
+            auto *nullNode = new Node<T>(getDefaultValue(), -1000);
+            nullNode->layer = top->layer + 1;
+            if (top->left != nullptr) {
+                nodeList->push_back(top->left);
+            } else {
+                nodeList->push_back(nullNode);
+            }
+            if (top->right != nullptr) {
+                nodeList->push_back(top->right);
+            } else {
+                nodeList->push_back(nullNode);
+            }
+        }
+        for (int i = 0; i < (1 << (maxLayer - layer + 1)) - 1; ++i)
+            buf.append("   ");
+
+        if (!nodeList->empty()) {
+            top = nodeList->front();
+            nodeList->pop_front();
+            if (nodeList->empty()) flag = true;
+        }
+    } while (!nodeList->empty() || flag);
+    cout << buf;
+}
+
+template<typename T>
+BSTreeStraightIterator<T> BSTree<T>::begin() {
+    return BSTreeStraightIterator<T>(root, elementCount, 0);
+}
+
+template<typename T>
+BSTreeStraightIterator<T> BSTree<T>::end() {
+    return BSTreeStraightIterator<T>(root, elementCount, -1);
+}
+
+template<typename T>
+BSTreeBackIterator<T> BSTree<T>::rbegin() {
+    return BSTreeBackIterator<T>(root, elementCount, elementCount - 1);
+}
+
+template<typename T>
+BSTreeBackIterator<T> BSTree<T>::rend() {
+    return BSTreeBackIterator<T>(root, elementCount, -1);
+}
+
+template<>
+int BSTree<int>::getDefaultValue() { return 0; }
+
+template<>
+char BSTree<char>::getDefaultValue() { return ' '; }
+
+template<>
+float BSTree<float>::getDefaultValue() { return 0.0; }
 
 template
 class BSTree<int>;

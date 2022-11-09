@@ -1,52 +1,65 @@
 //
-// Created by loki on 30.10.22.
+// Created by loki on 06.11.22.
 //
 
 #ifndef ASD_2_BSTREEITERATOR_H
 #define ASD_2_BSTREEITERATOR_H
 
+#include <vector>
+#include <list>
 #include "Node.h"
 
 template<typename T>
 class BSTreeIterator {
-//        using iterator_category = std::bidirectional_iterator_tag;
-//        using difference_type = std::ptrdiff_t;
-    using value_type = Node<T>;
-    using pointer = Node <T> *;  // or also value_type*
-    using reference = Node <T> &;  // or also value_type&
+public:
+    using value_type = T;
+    using pointer = Node<T> *;
+    using reference = BSTreeIterator<T> &;
 
-    BSTreeIterator(pointer _ptr, int _ind) {
-        ptr = _ptr;
+    BSTreeIterator(pointer _root, unsigned _elementCount, int _ind) {
+        root = _root;
         ind = _ind;
+        elementCount = _elementCount;
+        nodeVector = *new std::vector<pointer>();
+        fillList();
     }
 
-    T &operator*() const { return ptr[ind].data; }
+    value_type &operator*() const { return nodeVector[ind]->data; }
 
-    pointer operator->() { return &ptr[ind]; }
-
-    const BSTreeIterator &operator++() {
-        ind = ptr[ind].nextInd;
-        return *this;
-    }
-
-    const BSTreeIterator &operator--(int) {
-        ind = ptr[ind].prevInd;
-        return *this;
-    }
-
-    const BSTreeIterator operator++(int) {
-        ind = ptr[ind].nextInd;
-        return *this;
-    }
+    pointer operator->() { return &nodeVector[ind]; }
 
     int getInd() { return ind; }
 
     friend bool operator==(const BSTreeIterator &a, const BSTreeIterator &b) { return a.ind == b.ind; };
 
     friend bool operator!=(const BSTreeIterator &a, const BSTreeIterator &b) { return a.ind != b.ind; };
-private:
+
+    int getKey() { return nodeVector[ind]->key; }
+
+protected:
+
+    void fillList() {
+        pointer top = root;
+        auto nodeList = new std::list<pointer>();
+        while (top != nullptr || !nodeList->empty()) {
+            if (!nodeList->empty()) {
+                top = nodeList->front();
+                nodeList->pop_front();
+                nodeVector.push_back(top);
+                if (top->right != nullptr) top = top->right;
+                else top = nullptr;
+            }
+            while (top != nullptr) {
+                nodeList->push_front(top);
+                top = top->left;
+            }
+        }
+    }
+
+    std::vector<pointer> nodeVector;
     int ind;
-    pointer ptr;
+    unsigned elementCount;
+    pointer root;
 };
 
 
