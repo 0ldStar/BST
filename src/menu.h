@@ -8,7 +8,9 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include "ListInArray.h"
+#include "BSTree.h"
+#include "BSTreeStraightIterator.h"
+#include "BSTreeBackIterator.h"
 
 
 void printFillMenu();
@@ -17,16 +19,14 @@ void fillRandom();
 
 void fillValue();
 
-void fillValueByInd();
-
 void getElementMenu();
 
-void checkValue();
+void fillStepped();
 
-void changeValue();
+void deleteValue();
 
-void deleteValueMenu();
+void straightIterMenu();
 
-void iterMenu();
+void backIterMenu();
 
 #endif //ASD_1_MENU_H

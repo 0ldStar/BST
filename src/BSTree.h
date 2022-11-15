@@ -48,6 +48,8 @@ public:
 
     void printStructure();
 
+    unsigned getLaboriousness();
+
 private:
     void putElementInStr(T data);
 
@@ -60,6 +62,7 @@ private:
     Node<T> *root;
     unsigned elementCount;
     unsigned maxLayer;
+    T defaultValue;
 };
 
 #endif //ASD_2_BSTREE_H

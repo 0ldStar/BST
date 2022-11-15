@@ -20,13 +20,15 @@ public:
         root = _root;
         ind = _ind;
         elementCount = _elementCount;
-        nodeVector = *new std::vector<pointer>();
-        fillList();
+        if (root) {
+            nodeVector = *new std::vector<pointer>();
+            fillList();
+        }
     }
 
     value_type &operator*() const { return nodeVector[ind]->data; }
 
-    pointer operator->() { return &nodeVector[ind]; }
+    Node<T>* operator->() { return &nodeVector[ind]; }
 
     int getInd() { return ind; }
 

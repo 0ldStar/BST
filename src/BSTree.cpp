@@ -46,9 +46,11 @@ bool BSTree<T>::push(int key, T data) {
     auto nodeList = new list<Node<T> *>();
     Node<T> *top = root;
     unsigned layer = 0;
+    laboriousness = 0;
     if (!top) {
         root = new Node<T>(data, key, nullptr, layer);
         elementCount++;
+        laboriousness++;
         return true;
     }
     while (top != nullptr || !nodeList->empty()) {
@@ -79,6 +81,7 @@ bool BSTree<T>::push(int key, T data) {
         top = nodeList->back();
         nodeList->pop_back();
         layer++;
+        laboriousness++;
     }
     return false;
 }
@@ -87,7 +90,7 @@ template<typename T>
 bool BSTree<T>::pop(int key) {
     if (!root)
         return false;
-
+    laboriousness = 0;
     auto nodeList = new list<Node<T> *>();
     Node<T> *top = root;
     while (top != nullptr || !nodeList->empty()) {
@@ -109,6 +112,7 @@ bool BSTree<T>::pop(int key) {
         }
         top = nodeList->back();
         nodeList->pop_back();
+        laboriousness++;
     }
     return false;
 }
@@ -159,6 +163,7 @@ void BSTree<T>::popSwapNodes(Node<T> *target) {
 template<typename T>
 std::string BSTree<T>::getKeysList() {
     elementList.clear();
+    laboriousness = 0;
     if (root) {
         auto nodeList = new list<Node<T> *>();
         Node<T> *top = root;
@@ -181,7 +186,9 @@ std::string BSTree<T>::getKeysList() {
                     nodeList->push_front(top);
                 }
                 top = top->left;
+                laboriousness++;
             }
+            laboriousness++;
         }
     } else {
         elementList = "BSTree is empty!";
@@ -206,6 +213,8 @@ bool BSTree<T>::isEmpty() { return elementCount == 0; }
 template<typename T>
 void BSTree<T>::clear() {
     if (root) {
+        laboriousness = 0;
+        elementCount = 0;
         auto nodeList = new list<Node<T> *>();
         Node<T> *top = root;
         while (top != nullptr || !nodeList->empty()) {
@@ -232,7 +241,9 @@ void BSTree<T>::clear() {
                     nodeList->push_front(top);
                 }
                 top = top->left;
+                laboriousness++;
             }
+            laboriousness++;
         }
         root = nullptr;
     }
@@ -241,6 +252,7 @@ void BSTree<T>::clear() {
 template<typename T>
 T &BSTree<T>::operator[](unsigned int key) {
     if (root) {
+        laboriousness = 0;
         auto nodeList = new list<Node<T> *>();
         Node<T> *top = root;
         while (top != nullptr || !nodeList->empty()) {
@@ -249,26 +261,28 @@ T &BSTree<T>::operator[](unsigned int key) {
                     nodeList->push_front(top->left);
                 } else if (key > top->key && top->right) {
                     nodeList->push_front(top->right);
-                } else {
+                } else if (top->key == key) {
                     return top->data;
+                } else {
+                    break;
                 }
             }
             top = nodeList->back();
             nodeList->pop_back();
+            laboriousness++;
         }
     }
-    T tmp = getDefaultValue();
-    return tmp;
+    defaultValue = getDefaultValue();
+    laboriousness = -1;
+    return defaultValue;
 
 }
 
 template<typename T>
 bool BSTree<T>::merge(BSTree<T> &other) {
-    if (!root) {
-        root = nullptr;
+    if (!root)
         elementCount = 0;
-        laboriousness = 0;
-    }
+    laboriousness = 0;
     auto nodeList = new list<Node<T> *>();
     auto top = other.root;
     while (top != nullptr || !nodeList->empty()) {
@@ -280,6 +294,7 @@ bool BSTree<T>::merge(BSTree<T> &other) {
             push(top->key, top->data);
             if (top->right != nullptr) nodeList->push_front(top->right);
             top = top->left;
+            laboriousness++;
         }
     }
     return true;
@@ -339,6 +354,9 @@ void BSTree<T>::printStructure() {
     } while (!nodeList->empty() || flag);
     cout << buf;
 }
+
+template<typename T>
+unsigned BSTree<T>::getLaboriousness() { return laboriousness; }
 
 template<typename T>
 BSTreeStraightIterator<T> BSTree<T>::begin() {
