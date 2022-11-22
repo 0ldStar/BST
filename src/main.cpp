@@ -6,9 +6,10 @@ BSTree<int> bsTree;
 BSTree<int> other;
 
 int main() {
+    ofstream myfile;
     system("clear");
     int command = -1;
-    while (command != 14) {
+    while (command != 15) {
         printf("\tThis is interactive menu for List in Array structure.\n"
                "What you want to do?\n"
                "1) Fill the bsTree.\n"
@@ -24,7 +25,8 @@ int main() {
                "11) Straight iterator menu.\n"
                "12) Back iterator menu.\n"
                "13) Merge tree.\n"
-               "14) Exit.\n"
+               "14) Test laboriousness.\n"
+               "15) Exit.\n"
                ":");
         if (scanf("%d", &command) != 1) {
             while (getchar() != '\n') {}
@@ -100,6 +102,19 @@ int main() {
                     other.push(i, i);
                 }
                 bsTree.merge(other);
+                break;
+            case 14:
+                myfile.open ("../Rand1.txt", ios::trunc);
+                myfile.close();
+
+                myfile.open ("../Rand2.txt", ios::trunc);
+                myfile.close();
+
+                for (int i = 1; i < 100000; i*=10) {
+                    test_rand(i);
+                    test_ord(i);
+                }
+                system("python3 ../graph.py");
                 break;
             default:
                 break;

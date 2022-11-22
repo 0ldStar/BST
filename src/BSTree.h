@@ -28,11 +28,11 @@ public:
 
     bool isEmpty();
 
-    T &operator[](unsigned key);
+    T &operator[](INT_64 key);
 
-    bool push(int key, T data);
+    bool push(INT_64 key, T data);
 
-    bool pop(int key);
+    bool pop(INT_64 key);
 
     std::string getKeysList();
 

@@ -42,7 +42,7 @@ BSTree<T>::~BSTree() {
 
 
 template<typename T>
-bool BSTree<T>::push(int key, T data) {
+bool BSTree<T>::push(INT_64 key, T data) {
     auto nodeList = new list<Node<T> *>();
     Node<T> *top = root;
     unsigned layer = 0;
@@ -77,17 +77,17 @@ bool BSTree<T>::push(int key, T data) {
                 top->data = data;
                 return true;
             }
+            laboriousness++;
         }
         top = nodeList->back();
         nodeList->pop_back();
         layer++;
-        laboriousness++;
     }
     return false;
 }
 
 template<typename T>
-bool BSTree<T>::pop(int key) {
+bool BSTree<T>::pop(INT_64 key) {
     if (!root)
         return false;
     laboriousness = 0;
@@ -250,9 +250,9 @@ void BSTree<T>::clear() {
 }
 
 template<typename T>
-T &BSTree<T>::operator[](unsigned int key) {
+T &BSTree<T>::operator[](INT_64 key) {
+    laboriousness = 0;
     if (root) {
-        laboriousness = 0;
         auto nodeList = new list<Node<T> *>();
         Node<T> *top = root;
         while (top != nullptr || !nodeList->empty()) {
@@ -266,10 +266,10 @@ T &BSTree<T>::operator[](unsigned int key) {
                 } else {
                     break;
                 }
+                laboriousness++;
             }
             top = nodeList->back();
             nodeList->pop_back();
-            laboriousness++;
         }
     }
     defaultValue = getDefaultValue();
@@ -328,7 +328,7 @@ void BSTree<T>::printStructure() {
             if (top->layer <= maxLayer)
                 buf.append("*  ");
         } else {
-            sprintf(tmp, "%-3d", top->key);
+            sprintf(tmp, "%-3lld", top->key);
             buf.append(tmp);
             auto *nullNode = new Node<T>(getDefaultValue(), -1000);
             nullNode->layer = top->layer + 1;
@@ -387,6 +387,9 @@ char BSTree<char>::getDefaultValue() { return ' '; }
 template<>
 float BSTree<float>::getDefaultValue() { return 0.0; }
 
+template<>
+INT_64 BSTree<INT_64>::getDefaultValue() { return 0; }
+
 template
 class BSTree<int>;
 
@@ -395,3 +398,6 @@ class BSTree<char>;
 
 template
 class BSTree<float>;
+
+template
+class BSTree<INT_64>;
