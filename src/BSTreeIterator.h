@@ -28,7 +28,7 @@ public:
 
     value_type &operator*() const { return nodeVector[ind]->data; }
 
-    Node<T>* operator->() { return &nodeVector[ind]; }
+    Node<T> *operator->() { return &nodeVector[ind]; }
 
     int getInd() { return ind; }
 

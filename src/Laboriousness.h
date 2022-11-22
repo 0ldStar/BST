@@ -1,25 +1,10 @@
-////
-//// Created by loki on 17.11.22.
-////
 //
-//#ifndef ASD_2_LABORIOUSNESS_H
-//#define ASD_2_LABORIOUSNESS_H
+// Created by loki on 17.11.22.
 //
-//#include <time.h>
-//#include <math.h>
-//#include <iostream>
-//#include <fstream>
-//#include "BSTree.h"
-//
-//void test_rand(int n);
-//
-//void test_ord(int n);
-//
-//#endif //ASD_2_LABORIOUSNESS_H
 
+#ifndef ASD_2_LABORIOUSNESS_H
+#define ASD_2_LABORIOUSNESS_H
 
-#ifndef ADT_BST_TREE_TEST_H
-#define ADT_BST_TREE_TEST_H
 #include <ctime>
 #include <cmath>
 #include <iostream>
@@ -40,4 +25,4 @@ void test_rand(int n);
 
 void test_ord(int n);
 
-#endif //ADT_BST_TREE_TEST_H
+#endif //ASD_2_LABORIOUSNESS_H

@@ -299,7 +299,14 @@ bool BSTree<T>::merge(BSTree<T> &other) {
     }
     return true;
 }
-
+template<typename T>
+void BSTree<T>::checkLayer(Node<T> *p, unsigned layer) {
+    if (!p) return;
+    checkLayer(p->left, layer + 1);
+    p->layer = layer;
+    if (layer > maxLayer) maxLayer = layer;
+    checkLayer(p->right, layer + 1);
+}
 template<typename T>
 void BSTree<T>::printStructure() {
     auto nodeList = new list<Node<T> *>();
@@ -307,6 +314,9 @@ void BSTree<T>::printStructure() {
     bool flag;
     unsigned layer = -1;
     bool firstElFlag = false;
+
+    maxLayer = 0;
+    checkLayer(root, 0);
     cout << "Max layer: " << maxLayer << endl;
     string buf;
     char tmp[4];

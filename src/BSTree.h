@@ -57,6 +57,8 @@ private:
 
     T getDefaultValue();
 
+    void checkLayer(Node<T> *p, unsigned layer);
+
     unsigned laboriousness;
     std::string elementList;
     Node<T> *root;

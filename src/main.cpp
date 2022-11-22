@@ -10,7 +10,7 @@ int main() {
     system("clear");
     int command = -1;
     while (command != 15) {
-        printf("\tThis is interactive menu for List in Array structure.\n"
+        printf("\tThis is interactive menu for BSTree structure.\n"
                "What you want to do?\n"
                "1) Fill the bsTree.\n"
                "2) Get bsTree length.\n"
